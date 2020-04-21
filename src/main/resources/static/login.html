@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+</head>
+
+<body>
+<form>
+    id：<input type="text" id="id" value="123"/><br/>
+    名称：<input type="text" id="name" value="category xxx"/><br/>
+    <input type="button" value="提交" id="sender">
+</form>
+
+<script>
+    // if (window.localStorage) {
+    //     alert('This browser supports localStorage');
+    // } else {
+    //     alert('This browser does NOT support');
+    // }
+    $('#sender').click(function () {
+        var params = {};
+        //params.XX必须与Spring Mvc controller中的参数名称一致
+        //否则在controller中使用@RequestParam绑定
+        params.email = "123";
+        params.password = "1234";
+        params.rememberMe = 0;
+
+        $.ajax({
+            type: 'post',
+            headers: {
+                Accept: "application/json; charset=utf-8"
+            },
+            url: "http://localhost/community/auth/login",
+            // contentType: "application/x-www-form-urlencoded",
+            data: JSON.stringify(params),
+            // dataType: "json",
+            contentType: 'application/json',
+            crossDomain: true, //设置跨域为true
+            complete: function (xhr) {
+                localStorage.setItem('Authorization',xhr.getResponseHeader('Authorization'));
+            },
+            success: function (result) {
+                console.log(result);
+                alert("success");
+                // setTimeout(function(){
+                //     window.location.href='/community/index.html';
+                // },1500);
+            },
+            error: function (result) {
+                console.info(result);
+                alert("失败" + result);
+            }
+        });
+
+    });
+</script>
+</body>
+</html>
