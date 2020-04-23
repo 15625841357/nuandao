@@ -60,14 +60,6 @@ public class SupportApplicationTests {
     @Autowired
     private com.support.test.testService testService;
 
-    @Test
-    public void c() {
-        userRepository.findById(1).ifPresent(i -> {
-            Date birthDay = TimeConversionUtil.StringTransferToDate(i.getAge());
-            System.out.println("age:" + AgeUtlis.age(birthDay));
-        });
-    }
-
     @Ignore
     @Test
     public void B() {
