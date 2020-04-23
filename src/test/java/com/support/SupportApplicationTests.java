@@ -7,9 +7,13 @@ import com.support.repository.userRepository;
 import com.support.service.communityService;
 import com.support.service.photoService;
 import com.support.test.TaskTest;
+import com.support.utils.AgeUtlis;
 import com.support.utils.RedisUtil;
+import com.support.utils.TimeConversionUtil;
 import com.support.utils.iflytekUtils;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,12 @@ import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.io.FileInputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -51,14 +61,23 @@ public class SupportApplicationTests {
     private com.support.test.testService testService;
 
     @Test
-    public void B()   {
+    public void c() {
+        userRepository.findById(1).ifPresent(i -> {
+            Date birthDay = TimeConversionUtil.StringTransferToDate(i.getAge());
+            System.out.println("age:" + AgeUtlis.age(birthDay));
+        });
+    }
+
+    @Ignore
+    @Test
+    public void B() {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("任务1");
 
         Future<String> s1 = TaskTest.register();
 //        Future<String> s2 = TaskTest.register();
         try {
-            log.info("测试："+s1.get());
+            log.info("测试：" + s1.get());
 //            log.info(s2.get());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();

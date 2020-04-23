@@ -1,6 +1,7 @@
 package com.support.controller;
 
 import com.support.pojo.comment;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,6 +12,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @ClassName servlet
@@ -25,9 +29,7 @@ public class servlet extends HttpServlet implements Serializable{
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-
-
-//        String referer = req.getHeader("Referer");
+        //        String referer = req.getHeader("Referer");
 //        String name = req.getServerName();
 //        if(referer !=null && referer.contains(name)){
 //            resp.getWriter().append("下载..............");
@@ -37,7 +39,27 @@ public class servlet extends HttpServlet implements Serializable{
 //        }
 //        resp.setHeader("Refresh","5;URL=/community/index.html");
 //        resp.getWriter().append("5秒后跳转");
-//
+
+
+        Cookie[] cookies = req.getCookies();
+        String lastTime = null;
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("lastAccess")) {
+                lastTime = cookie.getValue();
+                break;
+            }
+        }
+        if (StringUtils.isEmpty(lastTime))
+            resp.getWriter().write("首次登录");
+        else
+            resp.getWriter().write("非首次访问  --- lastTime:" + lastTime);
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH:mm:ss").withZone(ZoneId.systemDefault());//DateTimeFormatter --- 线程安全
+        String time = dateFormat.format(Instant.now());  //Instant --- 获取时间戳
+        Cookie c = new Cookie("lastAccess", time);
+        c.setMaxAge(3600);
+        resp.addCookie(c);
+        resp.getWriter().flush();
+        resp.getWriter().close();
     }
 }
 

@@ -1,19 +1,15 @@
 package com.support.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.support.pojo.*;
 import com.support.pojo.view.community_user;
 import com.support.service.*;
-import com.support.utils.GetEmailUtils;
-import com.support.utils.JwtTokenUtils;
-import com.support.utils.RedisUtil;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
+import com.support.utils.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +17,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -57,8 +55,10 @@ public class communityController {
     private communityRelationService communityRelationService;
     @Resource
     private RedisUtil redisUtil;
-    private Gson gson = new Gson();
-    private Gson egson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+    @PersistenceContext
+    private EntityManager entityManager;
+    private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+    private Gson egson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").excludeFieldsWithoutExposeAnnotation().create();
 
     @PostMapping("/changePassword")
     @ApiOperation(value = "修改密码", notes = "修改密码")
@@ -123,7 +123,10 @@ public class communityController {
         List<userRelation> userRelations = userRelationService.findByConcerned(userId);
         List<Object> objects = new ArrayList<>();
         userRelations.forEach(i -> {
-            Map<String, Object> map = ImmutableMap.of("relationName", i.getRelationName(), "user", userService.findByIdNoOpenidAndRoleAndSecretKey(i.getConcern()));
+            Map<String, Object> newMap = new HashMap<>(userService.findByIdNoOpenidAndRoleAndSecretKey(i.getConcern()));
+            Date birthDay = TimeConversionUtil.StringTransferToDate(String.valueOf(newMap.get("age")));
+            newMap.put("age", AgeUtlis.age(birthDay));
+            Map<String, Object> map = ImmutableMap.of("relationName", i.getRelationName(), "user", newMap);
             objects.add(map);
         });
         return gson.toJson(objects);
@@ -135,7 +138,10 @@ public class communityController {
         List<userRelation> userRelations = userRelationService.findByConcern(userId);
         List<Object> objects = new ArrayList<>();
         userRelations.forEach(i -> {
-            Map<String, Object> map = ImmutableMap.of("relationName", i.getRelationName(), "user", userService.findByIdNoOpenidAndRoleAndSecretKey(i.getConcerned()));
+            Map<String, Object> newMap = new HashMap<>(userService.findByIdNoOpenidAndRoleAndSecretKey(i.getConcerned()));
+            Date birthDay = TimeConversionUtil.StringTransferToDate(String.valueOf(newMap.get("age")));
+            newMap.put("age", AgeUtlis.age(birthDay));
+            Map<String, Object> map = ImmutableMap.of("relationName", i.getRelationName(), "user", newMap);
             objects.add(map);
         });
         return gson.toJson(objects);
@@ -148,11 +154,16 @@ public class communityController {
      * @return
      */
     @PostMapping("/userlist")
+    @ApiOperation(value = "获取用户清单", notes = "获取用户清单")
     public String userlist(HttpServletRequest request) {
         String email = GetEmailUtils.GetEmail(request);
         Integer id = communityService.findByEmail(email).getId();
         log.info(String.valueOf(id));
         List<community_user> i = community_userService.findAllByCommunity_id(communityService.findByEmail(email).getId());
+        i.forEach(ii -> {
+            Date birthDay = TimeConversionUtil.StringTransferToDate(ii.getAge());
+            ii.setAge(String.valueOf(AgeUtlis.age(birthDay)));
+        });
         String s = gson.toJson(i);
         log.info(String.valueOf(s));
         return s;
@@ -163,12 +174,20 @@ public class communityController {
      * @return 返回个人用户数据
      */
     @PostMapping("/userInfo")
-    public String userInfo(Integer id) {
-        return egson.toJson(userService.findById(id).get());
+    @ApiOperation(value = "返回个人用户数据", notes = "返回个人用户数据")
+    public String userInfo(@RequestParam("id") Integer id) {
+        user u = userService.findById(id).get();
+        Date birthDay = TimeConversionUtil.StringTransferToDate(u.getAge());
+        System.out.println("id:" + id);
+        u.setAge(String.valueOf(AgeUtlis.age(birthDay)));
+        Session session = entityManager.unwrap(org.hibernate.Session.class);
+        session.evict(u);
+        return egson.toJson(u);
     }
 
 
     @PostMapping("/authorized")
+    @ApiOperation(value = "获取社区id", notes = "获取社区id")
     public String authorized(Integer id, HttpServletRequest request) {
         String email = GetEmailUtils.GetEmail(request);
         Integer i = communityService.findByEmail(email).getId();

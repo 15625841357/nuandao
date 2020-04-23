@@ -1,5 +1,7 @@
 package com.support.utils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -128,6 +130,18 @@ public class TimeConversionUtil {
     public static String getTimeStrNowByInstant() {
         DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
         return dateFormat.format(Instant.now());
+    }
+
+    //将String转换成Date
+    public static Date StringTransferToDate(String strTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date birthDay = null;
+        try {
+            birthDay = sdf.parse(strTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return birthDay;
     }
 
 
