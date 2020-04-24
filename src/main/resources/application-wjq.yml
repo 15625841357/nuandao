@@ -40,7 +40,8 @@ spring:
 #      additional-paths: src/main/java
 
 server:
-  port: 8080
+  port: 443
+#  port: 8080
   servlet.context-path: /community
   tomcat:
     uri-encoding: utf-8
