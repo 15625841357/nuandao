@@ -496,7 +496,7 @@ public class userController {
         String fileName = pcm.getOriginalFilename();
         assert fileName != null;
         new iflytekUtils((FileInputStream) pcm.getInputStream());
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         return iflytekUtils.getS();
 //        return "1";
     }

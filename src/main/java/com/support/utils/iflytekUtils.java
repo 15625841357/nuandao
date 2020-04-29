@@ -51,6 +51,7 @@ public class iflytekUtils {
 //		recognizer.setParameter(SpeechConstant.ASR_AUDIO_PATH,
 //				"./iat_test.pcm");
         recognizer.setParameter(SpeechConstant.RESULT_TYPE, "plain");
+        recognizer.setParameter(SpeechConstant.ACCENT,"taiwanese");
         recognizer.startListening(recListener);
 
         FileInputStream fis = null;
