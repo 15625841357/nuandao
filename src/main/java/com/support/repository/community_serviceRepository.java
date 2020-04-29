@@ -20,7 +20,9 @@ public interface community_serviceRepository extends CrudRepository<community_se
 
     List<community_service> findAllByUserId(Integer userId);
 
-    @Query(value = "SELECT * from community_service a INNER JOIN (SELECT community_service_id from community_service where user_id=?1 LIMIT ?2,?3) b on a.community_service_id=b.community_service_id ORDER BY a.community_service_id desc", nativeQuery = true)
+    @Query(value = "SELECT a.* from community_service a INNER JOIN " +
+            "(SELECT c.community_service_id from community_service c where c.user_id=?1 ORDER BY c.community_service_id desc LIMIT ?2,?3)" +
+            " b on a.community_service_id=b.community_service_id", nativeQuery = true)
     List<community_service> findAllPageByUserId(Integer userId, Integer number, Integer page);
 
     @Modifying
