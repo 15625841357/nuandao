@@ -3,7 +3,6 @@ package com.support.utils;
 import com.iflytek.cloud.speech.*;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
@@ -40,26 +39,21 @@ public class iflytekUtils {
         RecognizePcmfileByte(fileInputStream);
     }
 
-
     /**
      * 自动化测试注意要点 如果直接从音频文件识别，需要模拟真实的音速，防止音频队列的堵塞
      */
     public void RecognizePcmfileByte(FileInputStream fileInputStream) {
         SpeechRecognizer recognizer = SpeechRecognizer.getRecognizer();
         recognizer.setParameter(SpeechConstant.AUDIO_SOURCE, "-1");
-        //写音频流时，文件是应用层已有的，不必再保存
-//		recognizer.setParameter(SpeechConstant.ASR_AUDIO_PATH,
-//				"./iat_test.pcm");
         recognizer.setParameter(SpeechConstant.RESULT_TYPE, "plain");
-
-        recognizer.setParameter(SpeechConstant.ACCENT,"taiwanese");
+//        recognizer.setParameter(SpeechConstant.ACCENT,"taiwanese");
         recognizer.startListening(recListener);
 
         FileInputStream fis = null;
         final byte[] buffer = new byte[64 * 1024];
         try {
-            fis = fileInputStream;
-//            fis = new FileInputStream(new File("./test.pcm"));
+//            fis = fileInputStream;
+            fis = new FileInputStream(new java.io.File("./test.pcm"));
             if (0 == fis.available()) {
                 mResult.append("no audio avaible!");
                 recognizer.cancel();

@@ -36,15 +36,15 @@ public class WeChatUtils {
     private static com.support.service.userService userService;
     private static com.support.service.userRelationService userRelationService;
 
-    @Autowired
-    public WeChatUtils(com.support.service.userService userService) {
-        WeChatUtils.userService = userService;
-    }
-
-    @Autowired
-    public WeChatUtils(userRelationService userRelationService) {
-        WeChatUtils.userRelationService = userRelationService;
-    }
+//    @Autowired
+//    public WeChatUtils(com.support.service.userService userService) {
+//        WeChatUtils.userService = userService;
+//    }
+//
+//    @Autowired
+//    public WeChatUtils(userRelationService userRelationService) {
+//        WeChatUtils.userRelationService = userRelationService;
+//    }
 
     @Autowired
     public WeChatUtils(com.support.service.userService userService, userRelationService userRelationService) {

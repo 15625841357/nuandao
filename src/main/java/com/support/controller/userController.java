@@ -7,10 +7,7 @@ import com.support.pojo.*;
 import com.support.repository.userRelationRepository;
 import com.support.service.*;
 import com.support.test.testService;
-import com.support.utils.Http;
-import com.support.utils.RedisUtil;
-import com.support.utils.WeChatUtils;
-import com.support.utils.iflytekUtils;
+import com.support.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -18,14 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -137,8 +134,6 @@ public class userController {
     @PostMapping("/relation")
     @ApiOperation(value = "用户A关联用户B", notes = "用户A关联用户B")
     public String relation(@RequestParam("concern") Integer concern, @RequestParam("concerned") Integer concerned, @RequestParam("RelationName") String RelationName) {
-        System.out.println(concern);
-        System.out.println(concerned);
         if (userService.findById(concerned).isPresent()) {//表示有这个用户
             return Optional.ofNullable(userRelationService.findByConcernAndConcerned(concern, concerned)).map(u -> {
                 //有，则代表存在，故不能继续添加好友，原因是已经为好友
@@ -496,9 +491,15 @@ public class userController {
         String fileName = pcm.getOriginalFilename();
         assert fileName != null;
         new iflytekUtils((FileInputStream) pcm.getInputStream());
-        Thread.sleep(2000);
+        Thread.sleep(4000);
+//        File file=new File("D:\\APP\\java\\idea\\idea2019\\java\\putong\\test");
+//        OutputStream os=new FileOutputStream(file.getPath()+File.separator+fileName);
+//        byte[] bs = new byte[1024];
+//        int len;
+//        while ((len = pcm.getInputStream().read(bs)) != -1) {
+//            os.write(bs, 0, len);
+//        }
         return iflytekUtils.getS();
-//        return "1";
     }
 
     //    @Async
