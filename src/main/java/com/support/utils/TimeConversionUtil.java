@@ -144,6 +144,19 @@ public class TimeConversionUtil {
         return birthDay;
     }
 
+    /**
+     * @return 精准到秒
+     */
+    public static Date getAccurateNowtime() {
+        return new java.sql.Timestamp(new Date().getTime());
+    }
+
+    /**
+     * @return 只到年月份
+     */
+    public static Date getNowtime() {
+        return new java.sql.Date(new Date().getTime());
+    }
 
     ////工具类调试
     public static void main(String[] args) {

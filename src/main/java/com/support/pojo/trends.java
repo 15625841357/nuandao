@@ -9,11 +9,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-
 import java.io.Serializable;
 import java.util.Date;
-
-import static javax.persistence.FetchType.LAZY;
 
 /**
  * @ClassName test

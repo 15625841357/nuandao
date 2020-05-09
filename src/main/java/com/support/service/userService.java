@@ -33,4 +33,7 @@ public interface userService {
 
     @Transactional
     void updateLongitudeAndLatitudeByUserId(String longitude, String latitude, Integer userId);
+
+    @Transactional
+    int updateLastLogin(@Param("u") user u);
 }

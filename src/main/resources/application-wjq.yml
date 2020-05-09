@@ -46,8 +46,8 @@ server:
   tomcat:
     uri-encoding: utf-8
   ssl:
-    key-store: classpath:3791279_nuandao.zhouxy.xyz.pfx
-    key-store-password: q7lI293r
+    key-store: classpath:3886903_support.nuandao.xyz.pfx
+    key-store-password: LeQPXd9P
     key-store-type: PKCS12
 logging:
   level:

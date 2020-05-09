@@ -1,13 +1,14 @@
 package com.support.pojo;
 
 import com.google.gson.annotations.Expose;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Set;
+import java.util.Date;
 
 /**
  * @ClassName User
@@ -68,4 +69,7 @@ public class user implements Serializable {
     @Expose()
     private String photo;
 
+    @Expose()
+    @ApiModelProperty(hidden = true)
+    private Date lastLogin;
 }

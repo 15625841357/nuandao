@@ -2,6 +2,7 @@ package com.support;
 
 import com.google.gson.Gson;
 import com.support.pojo.test;
+import com.support.pojo.user;
 import com.support.repository.userRelationRepository;
 import com.support.repository.userRepository;
 import com.support.service.communityService;
@@ -28,10 +29,13 @@ import javax.annotation.Resource;
 import java.io.FileInputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -60,6 +64,13 @@ public class SupportApplicationTests {
     @Autowired
     private com.support.test.testService testService;
 
+    @Test
+    public void c() throws InterruptedException {
+        Date date=TimeConversionUtil.getAccurateNowtime();
+        log.info("cesjhi");
+        Thread.sleep(4000);
+        log.info(String.valueOf(date));
+    }
     @Ignore
     @Test
     public void B() {

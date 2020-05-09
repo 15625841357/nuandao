@@ -4,6 +4,7 @@ import com.support.pojo.user;
 import com.support.repository.userRepository;
 import com.support.service.userService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -49,12 +50,17 @@ public class userServiceImpl implements userService {
 
     @Override
     public int updatePhotoByUserId(String photo, Integer userId) {
-        return userRepository.updatePhotoByUserId(photo,userId);
+        return userRepository.updatePhotoByUserId(photo, userId);
     }
 
     @Override
     public void updateLongitudeAndLatitudeByUserId(String longitude, String latitude, Integer userId) {
-         userRepository.updateLongitudeAndLatitudeByUserId(longitude,latitude,userId);
+        userRepository.updateLongitudeAndLatitudeByUserId(longitude, latitude, userId);
+    }
+
+    @Override
+    public int updateLastLogin(@Param("u") user u) {
+        return userRepository.updateLastLogin(u);
     }
 
     @Override

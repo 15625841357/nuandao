@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.support.exception.UserException;
 import com.support.pojo.*;
+import com.support.service.communityRelationService;
+import com.support.service.communityService;
 import com.support.service.userRelationService;
 import com.support.service.userService;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +31,7 @@ import java.util.Optional;
  **/
 @Slf4j
 public class WeChatUtils {
-    /**
-     * @param code
-     * @return 获取openid和sessionkey
-     */
+
     private static com.support.service.userService userService;
     private static com.support.service.userRelationService userRelationService;
 
@@ -52,7 +51,10 @@ public class WeChatUtils {
         WeChatUtils.userRelationService = userRelationService;
     }
 
-
+    /**
+     * @param code
+     * @return 获取openid和sessionkey
+     */
     public static String getWXMessage(String code) {
         try {
             log.info("Start getSessionKey");

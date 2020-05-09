@@ -13,17 +13,32 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
+import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @ClassName userController
@@ -98,8 +113,10 @@ public class userController {
             user u = new user();
             u.setOpenId(Openid);
             u.setPhoto("1");
+            u.setAge("0");
             u.setRole("ROLE_USER");
             i = userService.save(u).getId();//保存之后，获取id
+            System.out.println("i" + i);
             user = userService.findById(i).get();//获取该用户信息
         } else {//have 有该用户
             i = user.getId();
@@ -122,12 +139,18 @@ public class userController {
         return egson.toJson(objects);
     }
 
-    /**
-     * @return 返回登录态
-     */
     @PostMapping("/check")
-    public String check() {
-        return gson.toJson(ImmutableMap.of("login", "true"));
+    public String check(@RequestBody user user) {
+        user.setLastLogin(TimeConversionUtil.getAccurateNowtime());
+        if (1 == userService.updateLastLogin(user)) {
+            return gson.toJson(ImmutableMap.of("login", "true"));
+        } else {//再次更新，如果不等于1则更新失败
+            user.setLastLogin(TimeConversionUtil.getAccurateNowtime());
+            if (1 == userService.updateLastLogin(user)) {
+                return gson.toJson(ImmutableMap.of("login", "true"));
+            }
+            return gson.toJson(ImmutableMap.of("login", "true,but update is fail"));
+        }
     }
 
 
@@ -481,7 +504,20 @@ public class userController {
     @PostMapping("/emergency")
     @ApiOperation(value = "应急接口", notes = "应急接口")
     public String emergency(@RequestParam("userId") Integer userId) {
-        new WeChatUtils(userService, userRelationService).tuiSong(userId);
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        executor.execute(() -> {
+            try {
+                new WeChatUtils(userService, userRelationService).tuiSong(userId);
+                String name = userService.findById(userId).get().getName();
+                communityRelation c = communityRelationService.findByUserId(userId);
+                String email = communityService.findById(c.getCommunityId()).get().getEmail();
+                String body = name + "可能摔倒,或者紧急需要帮忙";
+                MailUtil.SendMail(email, name + "突发意外", body);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        executor.shutdown();
         return "success";
     }
 
@@ -503,19 +539,9 @@ public class userController {
     }
 
     //    @Async
-    @GetMapping("/test")
+    @PostMapping("/test")
     @ApiOperation(value = "测试", notes = "带name参数")
-    public Object test(Integer id) {
-//        //适合于两次查询数据库的适合
-//        //customer相当于查询之后的数据
-//        return userService.findById(2).map(u -> {
-//            System.out.println(u);
-//            return u;
-//        }).orElseThrow(() -> {
-////            new RuntimeException("没有该人的数据~~~") ;
-//            return new UserException("没有该人的数据~~~");
-//        });
-
+    public String test(@RequestBody user user) throws InterruptedException {
 //        StopWatch stopWatch = new StopWatch();
 //        stopWatch.start("任务1");
 //        List<Object> objects = new ArrayList<>();
@@ -531,6 +557,23 @@ public class userController {
 //        stopWatch.stop();
 //        System.out.println(stopWatch.prettyPrint());
 //        return "主线程结束";
-        return userService.findByIdNoOpenidAndRoleAndSecretKey(id);
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start("任务1");
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+        for (int i = 0; i < 10; i++) {
+            int finalI = i;
+            executor.execute(() -> {
+                try {
+                    Thread.sleep(1000);
+                    System.out.println((finalI + 1));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+        executor.shutdown();
+        stopWatch.stop();
+        System.out.println(stopWatch.prettyPrint());
+        return "主线程结束";
     }
 }

@@ -12,7 +12,7 @@
     <artifactId>support</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>support</name>
-<!--    ⭐️-->
+    <!--    ⭐️-->
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -36,12 +36,12 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-devtools</artifactId>-->
-<!--            <scope>runtime</scope>-->
-<!--            <optional>true</optional>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-devtools</artifactId>-->
+        <!--            <scope>runtime</scope>-->
+        <!--            <optional>true</optional>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -158,6 +158,11 @@
             <artifactId>json-jena</artifactId>
             <version>1.0</version>
         </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -174,15 +179,15 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-<!--                    <includeSystemScope>true</includeSystemScope>-->
+                    <!--                    <includeSystemScope>true</includeSystemScope>-->
                     <mainClass>com.support.SupportApplication</mainClass>
                 </configuration>
                 <executions>
-                <execution>
-                <goals>
-                    <goal>repackage</goal>
-                </goals>
-                </execution>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
 
