@@ -133,8 +133,8 @@ public class TimeConversionUtil {
     }
 
     //将String转换成Date
-    public static Date StringTransferToDate(String strTime) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+    public static Date StringTransferToDate(String strTime,String pattern) {
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         Date birthDay = null;
         try {
             birthDay = sdf.parse(strTime);

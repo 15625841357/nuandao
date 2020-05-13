@@ -114,15 +114,16 @@ public class WeChatUtils {
         return responseEntity.getBody();
     }
 
-    public void tuiSong(Integer id) {
+    public void tuiSong(Integer id,String thing1) {
         String time = TimeConversionUtil.getTimeStrNowByInstant();
         Map<String, WeChatTemplateData> data = new HashMap<>();
         WeChatMessage weChatMessage = new WeChatMessage();
         List<userRelation> userRelations = userRelationService.findByConcern(id);
         user u = userService.findById(id).get();
         userRelations.forEach(i -> {
+            System.out.println("测试");
             user user = userService.findById(i.getConcerned()).get();
-            data.put("thing1", new WeChatTemplateData("可能摔倒,或者紧急需要帮忙"));
+            data.put("thing1", new WeChatTemplateData(thing1));
             data.put("date2", new WeChatTemplateData(time));
             data.put("name3", new WeChatTemplateData(u.getName()));
             weChatMessage.setTouser(user.getOpenId());

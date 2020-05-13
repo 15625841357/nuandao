@@ -6,7 +6,9 @@ import com.support.service.community_serviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -71,7 +73,10 @@ public class community_serviceServiceImpl implements community_serviceService {
         return community_serviceRepository.findByUserIdAndPeiLiao(userId);
     }
 
-
+    @Override
+    public List<Map<String, Object>> findByCommunityIdAndStatus(Integer id, Integer status) {
+        return community_serviceRepository.findByCommunityIdAndStatus(id,status);
+    }
 
 
 }

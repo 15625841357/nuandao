@@ -116,7 +116,6 @@ public class userController {
             u.setAge("0");
             u.setRole("ROLE_USER");
             i = userService.save(u).getId();//保存之后，获取id
-            System.out.println("i" + i);
             user = userService.findById(i).get();//获取该用户信息
         } else {//have 有该用户
             i = user.getId();
@@ -160,7 +159,6 @@ public class userController {
         if (userService.findById(concerned).isPresent()) {//表示有这个用户
             return Optional.ofNullable(userRelationService.findByConcernAndConcerned(concern, concerned)).map(u -> {
                 //有，则代表存在，故不能继续添加好友，原因是已经为好友
-                System.out.println(u);
                 return "already";
             }).orElseGet(() -> {
                 //没有，则代表不存在，故可以添加好友
@@ -317,7 +315,6 @@ public class userController {
     @PostMapping("/findTrail")
     @ApiOperation(value = "用户查看轨迹", notes = "用户查看轨迹")
     public Object findTrail(@RequestParam("userId") Integer userId) {
-        log.info(String.valueOf(redisUtil.getExpire("longitudeAndLatitude1:uesrId" + userId)));
         return redisUtil.lGet("longitudeAndLatitude1:uesrId" + userId, 0, -1);
     }
 
@@ -407,7 +404,6 @@ public class userController {
     @PostMapping("/publishTrends")
     @ApiOperation(value = "发表动态", notes = "发表动态")
     public String publishTrends(@RequestBody trends trends) {
-        System.out.println("动态" + trends);
         trendsService.save(trends);
         return "1";
     }
@@ -496,8 +492,6 @@ public class userController {
     @PostMapping("/choosePhoto")
     @ApiOperation(value = "选择头像", notes = "选择头像")
     public void choosePhoto(@RequestParam("photo") String photo, @RequestParam("UserId") Integer UserId) {
-        System.out.println(photo);
-        System.out.println(UserId);
         userService.updatePhotoByUserId(photo, UserId);
     }
 
@@ -507,7 +501,7 @@ public class userController {
         ExecutorService executor = Executors.newFixedThreadPool(1);
         executor.execute(() -> {
             try {
-                new WeChatUtils(userService, userRelationService).tuiSong(userId);
+                new WeChatUtils(userService, userRelationService).tuiSong(userId,"可能摔倒,或者紧急需要帮忙");
                 String name = userService.findById(userId).get().getName();
                 communityRelation c = communityRelationService.findByUserId(userId);
                 String email = communityService.findById(c.getCommunityId()).get().getEmail();

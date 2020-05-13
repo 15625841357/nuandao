@@ -1,18 +1,15 @@
 package com.support;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import com.support.pojo.test;
-import com.support.pojo.user;
+import com.google.gson.GsonBuilder;
+import com.support.pojo.communityRelation;
 import com.support.repository.userRelationRepository;
 import com.support.repository.userRepository;
-import com.support.service.communityService;
-import com.support.service.photoService;
+import com.support.service.*;
 import com.support.test.TaskTest;
-import com.support.utils.AgeUtlis;
-import com.support.utils.RedisUtil;
-import com.support.utils.TimeConversionUtil;
-import com.support.utils.iflytekUtils;
-import lombok.Data;
+import com.support.test.testService;
+import com.support.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -21,56 +18,94 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.AsyncResult;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
-import java.io.FileInputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SpringBootTest
 @CacheConfig(cacheNames = "photo:")
 @RunWith(SpringRunner.class)
 @Slf4j
 public class SupportApplicationTests {
-    @Resource
-    private RedisUtil redisUtil;
-    private Gson gson = new Gson();
     @Autowired
-    private userRepository userRepository;
+    private community_applicationService community_applicationService;
     @Autowired
-    private userRelationRepository userRelationRepository;
+    private community_serviceService community_serviceService;
     @Autowired
-    private com.support.repository.friendTokenRepository friendTokenRepository;
+    private userRelationService userRelationService;
+    @Autowired
+    private userService userService;
+    @Autowired
+    private community_userService community_userService;
+    @Autowired
+    private com.support.repository.communityRepository communityRepository;
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
     private communityService communityService;
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private communityRelationService communityRelationService;
+    @Autowired
+    private userRelationRepository userRelationRepository;
+    @Autowired
+    private com.support.test.testService testService;
+    @Autowired
+    private com.support.test.TaskTest TaskTest;
     @Autowired
     private photoService photoService;
     @Autowired
-    private TaskTest TaskTest;
+    private commentService commentService;
     @Autowired
-    private com.support.test.testService testService;
+    private trendsService trendsService;
+    @Autowired
+    private likeCountService likeCountService;
+    @Autowired
+    private signInService signInService;
+    @Autowired
+    private friendTokenService friendTokenService;
+    @Resource
+    private RedisUtil redisUtil;
+    //    private Gson gson = new Gson();
+    private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+    private Gson egson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").excludeFieldsWithoutExposeAnnotation().create();
 
     @Test
-    public void c() throws InterruptedException {
-        Date date=TimeConversionUtil.getAccurateNowtime();
-        log.info("cesjhi");
-        Thread.sleep(4000);
-        log.info(String.valueOf(date));
+    public void c() {
+//        Integer id = 404;
+//        userService.findById(id).ifPresent(user -> {
+//            System.out.println(user);
+//            java.util.Date date = TimeConversionUtil.StringTransferToDate(String.valueOf(user.getLastLogin()), "yyyy-MM-dd HH:mm:ss");
+//            String time = AgeUtlis.longtime(date);
+//            if ("3".equals(time)) {
+//                ExecutorService executor = Executors.newFixedThreadPool(1);
+//                executor.execute(() -> {
+//                    try {
+//                        new WeChatUtils(userService, userRelationService).tuiSong(404);
+//                        String name = userService.findById(404).get().getName();
+//                        communityRelation c = communityRelationService.findByUserId(404);
+//                        String email = communityService.findById(c.getCommunityId()).get().getEmail();
+//                        String body = name + "可能摔倒,或者紧急需要帮忙";
+//                        MailUtil.SendMail(email, name + "突发意外", body);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                });
+//                executor.shutdown();
+//            }
+//        });
+//        System.out.println("吴俊淇");
     }
+
     @Ignore
     @Test
     public void B() {

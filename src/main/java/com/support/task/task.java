@@ -1,17 +1,22 @@
 package com.support.task;
 
-import com.support.pojo.WeChatMessage;
-import com.support.pojo.userRelation;
-import com.support.repository.userRelationRepository;
+import com.support.pojo.communityRelation;
+import com.support.pojo.user;
+import com.support.service.communityRelationService;
+import com.support.service.communityService;
 import com.support.service.userRelationService;
 import com.support.service.userService;
-import com.support.utils.TimeConversionUtil;
+import com.support.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
+import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @ClassName task
@@ -19,37 +24,46 @@ import java.util.Map;
  * @Date 2020/4/7 14:35
  * @Version 1.0
  **/
-//@Component
+@Component
 @Slf4j
+@EnableScheduling
 public class task {
     @Autowired
-    private static userService userService;
+    private userService userService;
     @Autowired
-    private static userRelationService userRelationService;
+    private userRelationService userRelationService;
+    @Autowired
+    private communityService communityService;
+    @Autowired
+    private communityRelationService communityRelationService;
+    @Resource
+    private RedisUtil redisUtil;
 
-    /**
-     * 微信推送
-     */
-//    @Scheduled(cron = "0 0 23 * * ?")
-    public static void tuiSong(Integer id) {
-        String time = TimeConversionUtil.getTimeStrNowByInstant();
-        Map<String, Object> data = new HashMap<>();
-        WeChatMessage weChatMessage = new WeChatMessage();
-        System.out.println(id);
-        List<userRelation> userRelations = userRelationService.findByConcern(id);
-        System.out.println(userRelations);
-//        user u = userService.findById(id).get();
-//        userRelations.forEach(i -> {
-//            user user = userService.findById(i.getConcerned()).get();
-//            data.put("thing1", "我是文权的爸爸");
-//            data.put("date2", time);
-//            data.put("name3", u.getName());
-//            weChatMessage.setOpenId(user.getOpenId());
-//            weChatMessage.setTemplateId("ceHT9A7PemdGKavySKZySYHeiAdW8KgSox32Xqh9oOY");
-//            weChatMessage.setPage("pages/openMap/openMap?name=" + u.getName());
-//            weChatMessage.setData(data);
-//            String s = WeChatUtils.push(weChatMessage);
-//            log.info(s);
-//        });
+    @Scheduled(cron = "00 00 12 * * ?")
+    public void longTimeNoLogin() {
+        List<user> users = userService.findAll();
+        users.forEach(user -> {
+            if (!redisUtil.hasKey("longTimeNoLogin:" + user.getId())) {
+                java.util.Date date = TimeConversionUtil.StringTransferToDate(String.valueOf(user.getLastLogin()), "yyyy-MM-dd HH:mm:ss");
+                long time = AgeUtlis.longtime(date);
+                if (time >= 3) {
+                    redisUtil.set("longTimeNoLogin:" + user.getId(), 1, 60 * 60 * 24);
+                    ExecutorService executor = Executors.newFixedThreadPool(1);
+                    executor.execute(() -> {
+                        try {
+                            new WeChatUtils(userService, userRelationService).tuiSong(user.getId(), "已经连续" + time + "没有登录啦，请联系下");
+                            String name = userService.findById(user.getId()).get().getName();
+                            communityRelation c = communityRelationService.findByUserId(user.getId());
+                            String email = communityService.findById(c.getCommunityId()).get().getEmail();
+                            String body = name + "已经连续" + time + "没有登录啦，请联系下" + name + ".";
+                            MailUtil.SendMail(email, name + "已经连续" + time + "没有登录", body);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    });
+                    executor.shutdown();
+                }
+            }
+        });
     }
 }

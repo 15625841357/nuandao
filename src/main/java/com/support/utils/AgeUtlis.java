@@ -11,6 +11,11 @@ import java.util.Date;
  **/
 public class AgeUtlis {
 
+    /**
+     *
+     * @param birthDay
+     * @return 计算年龄
+     */
     public static int age(Date birthDay) {
         int age;
         Calendar cal = Calendar.getInstance();
@@ -35,5 +40,20 @@ public class AgeUtlis {
             }
         }
         return age;
+    }
+
+    /**
+     *
+     * @param date
+     * @return 返回从当前时间到已有的date数据相差的天数
+     */
+    public static long longtime(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        long time1 = cal.getTimeInMillis();
+        cal.setTime(new java.util.Date());
+        long time2 = cal.getTimeInMillis();
+        long between_days = (time2 - time1) / (1000 * 3600 * 24);
+        return Integer.parseInt(String.valueOf(between_days));
     }
 }

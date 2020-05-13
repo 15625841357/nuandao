@@ -124,7 +124,7 @@ public class communityController {
         List<Object> objects = new ArrayList<>();
         userRelations.forEach(i -> {
             Map<String, Object> newMap = new HashMap<>(userService.findByIdNoOpenidAndRoleAndSecretKey(i.getConcern()));
-            Date birthDay = TimeConversionUtil.StringTransferToDate(String.valueOf(newMap.get("age")));
+            Date birthDay = TimeConversionUtil.StringTransferToDate(String.valueOf(newMap.get("age")), "yyyy-MM-dd");
             newMap.put("age", AgeUtlis.age(birthDay));
             Map<String, Object> map = ImmutableMap.of("relationName", i.getRelationName(), "user", newMap);
             objects.add(map);
@@ -139,7 +139,7 @@ public class communityController {
         List<Object> objects = new ArrayList<>();
         userRelations.forEach(i -> {
             Map<String, Object> newMap = new HashMap<>(userService.findByIdNoOpenidAndRoleAndSecretKey(i.getConcerned()));
-            Date birthDay = TimeConversionUtil.StringTransferToDate(String.valueOf(newMap.get("age")));
+            Date birthDay = TimeConversionUtil.StringTransferToDate(String.valueOf(newMap.get("age")), "yyyy-MM-dd");
             newMap.put("age", AgeUtlis.age(birthDay));
             Map<String, Object> map = ImmutableMap.of("relationName", i.getRelationName(), "user", newMap);
             objects.add(map);
@@ -147,26 +147,17 @@ public class communityController {
         return gson.toJson(objects);
     }
 
-
-    /**
-     * 用户清单，未完成------------------------------------
-     *
-     * @return
-     */
     @PostMapping("/userlist")
     @ApiOperation(value = "获取用户清单", notes = "获取用户清单")
     public String userlist(HttpServletRequest request) {
         String email = GetEmailUtils.GetEmail(request);
         Integer id = communityService.findByEmail(email).getId();
-        log.info(String.valueOf(id));
-        List<community_user> i = community_userService.findAllByCommunity_id(communityService.findByEmail(email).getId());
+        List<community_user> i = community_userService.findAllByCommunity_id(id);
         i.forEach(ii -> {
-            Date birthDay = TimeConversionUtil.StringTransferToDate(ii.getAge());
+            Date birthDay = TimeConversionUtil.StringTransferToDate(ii.getAge(), "yyyy-MM-dd");
             ii.setAge(String.valueOf(AgeUtlis.age(birthDay)));
         });
-        String s = gson.toJson(i);
-        log.info(String.valueOf(s));
-        return s;
+        return gson.toJson(i);
     }
 
     /**
@@ -177,8 +168,7 @@ public class communityController {
     @ApiOperation(value = "返回个人用户数据", notes = "返回个人用户数据")
     public String userInfo(@RequestParam("id") Integer id) {
         user u = userService.findById(id).get();
-        Date birthDay = TimeConversionUtil.StringTransferToDate(u.getAge());
-        System.out.println("id:" + id);
+        Date birthDay = TimeConversionUtil.StringTransferToDate(u.getAge(), "yyyy-MM-dd");
         u.setAge(String.valueOf(AgeUtlis.age(birthDay)));
         Session session = entityManager.unwrap(org.hibernate.Session.class);
         session.evict(u);
@@ -213,35 +203,24 @@ public class communityController {
     }
 
     @PostMapping("/changeStatus")
-    @ApiOperation(value = "修改status通过社区id和服务id", notes = "修改status通过社区id和服务id---0代表未受理---1代表同意---2代表不同意---3代表已完成")
+    @ApiOperation(value = "修改status通过服务status和服务id", notes = "修改status通过服务status和服务id---0代表未受理---1代表同意---2代表不同意---3代表已完成")
     public Integer changeStatus(@RequestParam("status") Integer status, @RequestParam("community_service_id") Integer community_service_id) {
         return community_serviceService.updateStatusByServiceId(status, community_service_id);
     }
 
-    /**
-     * save
-     *
-     * @param tokenHeader
-     * @param response
-     * @return 验证token
-     * @throws IOException
-     */
+    @PostMapping("/servicesNumberList")
+    @ApiOperation(value = "查看每个用户的status的个数通过服务status和社区id", notes = "返回社区的每个用户的status的个数")
+    public String servicesNumberList(@RequestParam("status") Integer status, HttpServletRequest request) {
+        String email = GetEmailUtils.GetEmail(request);
+        Integer id = communityService.findByEmail(email).getId();
+        HashMap<Object, Object> newmap = new HashMap<>();
+        community_serviceService.findByCommunityIdAndStatus(id, status).forEach(map -> newmap.put(map.get("user_id"), map.get("number")));
+        return gson.toJson(newmap);
+    }
+
     @PostMapping("/token")
     public void token(@RequestBody String tokenHeader, HttpServletRequest request, HttpServletResponse response) throws IOException {
-//        System.out.println("tokenHeader:"+tokenHeader);
         System.out.println(request.getHeader(JwtTokenUtils.TOKEN_HEADER));
 
-//        String token = tokenHeader.replace(JwtTokenUtils.TOKEN_PREFIX, "");
-//        System.out.println(token);
-//        boolean expiration = JwtTokenUtils.isExpiration(token);
-//        if (expiration) {
-//            response.getWriter().append("fail");
-//            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-//        } else {
-//            response.getWriter().append("success");
-//            response.setStatus(HttpServletResponse.SC_OK);
-//        }
-//        response.getWriter().flush();
-//        response.getWriter().close();
     }
 }

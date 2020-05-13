@@ -4,7 +4,9 @@ import com.support.pojo.community_service;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -33,5 +35,7 @@ public interface community_serviceService {
 
     Integer findByUserIdAndWeiXiu(Integer userId);
 
-     Integer findByUserIdAndPeiLiao(Integer userId);
+    Integer findByUserIdAndPeiLiao(Integer userId);
+
+    List<Map<String,Object>> findByCommunityIdAndStatus(Integer id, Integer status);
 }
